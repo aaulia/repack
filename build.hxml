@@ -1,0 +1,7 @@
+-cp lib
+-cp src
+-main Main
+-debug
+-D haxe3
+-lib format
+-neko lib/run.n

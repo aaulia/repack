@@ -1,0 +1,10 @@
+<project name="repack" url="" license="MIT">
+    <user name="aaulia"/>
+    <tag v="cross"/>
+    <tag v="packing"/>
+    <tag v="rectangle"/>
+    <tag v="sprite"/>
+    <tag v="texture"/>
+    <description>Repack is a library/tool for doing rectangle/texture/sprite packing using MAXRECT algorithm</description>
+    <version name="1.0">Initial release, everything is working correctly</version>
+</project>
