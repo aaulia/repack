@@ -1,4 +1,4 @@
-<project name="repack" url="" license="MIT">
+<project name="repack" url="http://github.com/aaulia/repack" license="MIT">
     <user name="aaulia"/>
     <tag v="cross"/>
     <tag v="packing"/>
