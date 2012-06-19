@@ -4,12 +4,16 @@ import format.png.Data;
 import format.png.Reader;
 import format.png.Writer;
 import format.png.Tools;
+
 import haxe.io.Bytes;
 import haxe.io.Path;
+
 import haxe.Json;
 import neko.Sys;
+
 import sys.FileSystem;
 import sys.io.File;
+
 import org.repack.Packer;
 import org.repack.Rectangle;
 
@@ -24,6 +28,10 @@ class Main {
 		var args = Sys.args();
 		Sys.setCwd(new Path(args.pop()).toString());
 
+		if (args.length == 0) {
+			printHelp();
+		}
+
 		var inputs = [];
 		var output = new Path(Sys.getCwd());
 		var config = new Config();
@@ -35,6 +43,7 @@ class Main {
 			}
 
 			switch (key) {
+				case "-h", "-help"   : printHelp();
 				case "-o", "-output" : output = new Path(args.shift());
 				case "-i", "-input"  : inputs = args.shift().split(":");
 				default              : config.parse(key, args);
@@ -72,8 +81,8 @@ class Main {
 		if (oext != "png") { oext = "png"; }
 		if (FileSystem.exists(odir) == false) {	
 			FileSystem.createDirectory(odir); 
-			odir = FileSystem.fullPath(odir); 
 		}
+		odir = FileSystem.fullPath(odir); 
 		
 		
 		
@@ -116,6 +125,35 @@ class Main {
 			++page;
 		}
 
+	}
+
+	private static function printHelp() {
+		Sys.println("Usage: repack [options]");
+		Sys.println("Options are:");
+		Sys.println("-h, -help   : Print this help");
+		Sys.println("-i, -input  : File(s) or directories to be used as input path, ");
+		Sys.println("              separated by ':'. Directories are read recursively." );
+		Sys.println("-o, -output : File or directory to place the result");
+		Sys.println("-w, -width  : Canvas/atlas width");
+		Sys.println("-h, -height : Canvas/atlas height");
+		Sys.println("-m, -method : Packing method, which can be one of:");
+		Sys.println("                  tl -> TopLeftPacking");
+		Sys.println("                  a  -> BestAreaPacking");
+		Sys.println("                  ss -> BestShortSidePacking");
+		Sys.println("                  ls -> BestLongSidePacking");
+		Sys.println("");
+		Sys.println("-s, -sort   : Sort method(s) used to sort the input images, can be ");
+		Sys.println("              one or more (separeted by ':') of:");
+		Sys.println("                  w   -> Sort by width descending");
+		Sys.println("                  h   -> Sort by height descending");
+		Sys.println("                  a   -> Sort by area descending");
+		Sys.println("                  min -> Sort by min(w, h) descending");
+		Sys.println("                  max -> Sort by max(w, h) descending");
+		Sys.println("");
+		Sys.println("-r, -rotate : Use rotation to maximize placement, can be one of:");
+		Sys.println("              normal     -> Only rotate if there is no space found.");
+		Sys.println("              aggressive -> Always rotate, and choose the best one.");
+		Sys.exit(0);
 	}
 
 	private static function saveJSON(data, path) {
