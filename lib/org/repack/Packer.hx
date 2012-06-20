@@ -48,7 +48,7 @@ class Packer<T> implements Generic {
 
 
 	public var length (g_length, never) :Int;
-	inline function g_length():Int {
+	private inline function g_length():Int {
 		return used.length;
 	}
 
@@ -124,10 +124,10 @@ class Packer<T> implements Generic {
 		return true;
 	}
 
-	inline function min(a:Int, b:Int):Int { return (a < b) ? a : b; }
-	inline function max(a:Int, b:Int):Int { return (a > b) ? a : b; }
+	private inline function min(a:Int, b:Int):Int { return (a < b) ? a : b; }
+	private inline function max(a:Int, b:Int):Int { return (a > b) ? a : b; }
 
-	function findTopLeft(width:Int, height:Int):Rectangle {
+	private function findTopLeft(width:Int, height:Int):Rectangle {
 		var px = 0xffffff;
 		var py = 0xffffff;
 		var rc = null;
@@ -137,23 +137,18 @@ class Packer<T> implements Generic {
 				continue;
 			}
 
-			if (py > f.y) {
-				py = f.y;
+			if (py < f.y) { continue; }
+			if (py > f.y || px > f.x) {
 				px = f.x;
+				py = f.y;
 				rc = f;
-			} else 
-			if (py == f.y) {
-				if (px > f.x) {
-					px = f.x;
-					rc = f;
-				}
 			}
 		}
 
 		return rc;
 	}
 
-	function findBestShortSide(width:Int, height:Int):Rectangle { 
+	private function findBestShortSide(width:Int, height:Int):Rectangle { 
 		var ds = 0xffffff;
 		var px = 0xffffff;
 		var py = 0xffffff;
@@ -165,26 +160,19 @@ class Packer<T> implements Generic {
 			}
 
 			var cs = min(f.width - width, f.height - height);
+			if (ds < cs) { continue; }
 			if (ds > cs) {
 				ds = cs;
 				px = f.x;
 				py = f.y;
 				rc = f;
-			} else 
-			if (ds == cs) {
-				if (py > f.y) {
+			} else {
+				if (py < f.y) { continue; }
+				if (py > f.y || px > f.x) {
 					ds = cs;
 					px = f.x;
 					py = f.y;
 					rc = f;
-				} else 
-				if (py == f.y) {
-					if (px > f.x) {
-						ds = cs;
-						px = f.x;
-						py = f.y;
-						rc = f;
-					}
 				}
 			}
 		}
@@ -192,7 +180,7 @@ class Packer<T> implements Generic {
 		return rc;
 	}
 
-	function findBestLongSide(width:Int, height:Int):Rectangle { 
+	private function findBestLongSide(width:Int, height:Int):Rectangle { 
 		var ds = 0xffffff;
 		var px = 0xffffff;
 		var py = 0xffffff;
@@ -204,26 +192,19 @@ class Packer<T> implements Generic {
 			}
 
 			var cs = max(f.width - width, f.height - height);
+			if (ds < cs) { continue; }
 			if (ds > cs) {
 				ds = cs;
 				px = f.x;
 				py = f.y;
 				rc = f;
-			} else 
-			if (ds == cs) {
-				if (py > f.y) {
+			} else {
+				if (py < f.y) { continue; }
+				if (py > f.y || px > f.x) {
 					ds = cs;
 					px = f.x;
 					py = f.y;
 					rc = f;
-				} else 
-				if (py == f.y) {
-					if (px > f.x) {
-						ds = cs;
-						px = f.x;
-						py = f.y;
-						rc = f;
-					}
 				}
 			}
 		}
@@ -231,7 +212,7 @@ class Packer<T> implements Generic {
 		return rc;
 	}
 
-	function findBestArea(width:Int, height:Int):Rectangle { 
+	private function findBestArea(width:Int, height:Int):Rectangle { 
 		var da = 0xffffff;
 		var px = 0xffffff;
 		var py = 0xffffff;
@@ -243,26 +224,19 @@ class Packer<T> implements Generic {
 			}
 
 			var ca = (f.width * f.height) - (width * height);
+			if (da < ca) { continue; }
 			if (da > ca) {
 				da = ca;
 				px = f.x;
 				py = f.y;
 				rc = f;
-			} else 
-			if (da == ca) {
-				if (py > f.y) {
+			} else {
+				if (py < f.y) { continue; }
+				if (py > f.y || px > f.x) {
 					da = ca;
 					px = f.x;
 					py = f.y;
 					rc = f;
-				} else 
-				if (py == f.y) {
-					if (px > f.x) {
-						da = ca;
-						px = f.x;
-						py = f.y;
-						rc = f;
-					}
 				}
 			}
 		}
@@ -270,7 +244,7 @@ class Packer<T> implements Generic {
 		return rc;
 	}
 
-	inline function place(rect:Rectangle):Void {
+	private inline function place(rect:Rectangle):Void {
 		var c = free.length;
 		var i = 0;
 		while (i < c) {
@@ -288,7 +262,7 @@ class Packer<T> implements Generic {
 		}
 	}
 
-	inline function purge() {
+	private inline function purge() {
 		var c = free.length;
 		var i = 0;
 		while (i < c) {

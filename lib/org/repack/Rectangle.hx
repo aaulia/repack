@@ -69,35 +69,35 @@ class Rectangle {
 	}
 
 	public var left (g_left, s_left):Int;
-	inline function g_left():Int  { return x; }
-	inline function s_left(v:Int):Int { 
+	private inline function g_left():Int  { return x; }
+	private inline function s_left(v:Int):Int { 
 		width -= (v - x); 
 		return x = v; 
 	}
 
 	public var top (g_top, s_top):Int;
-	inline function g_top():Int  { return y; }
-	inline function s_top(v:Int):Int { 
+	private inline function g_top():Int  { return y; }
+	private inline function s_top(v:Int):Int { 
 		height -= (v - y); 
 		return y = v; 
 	}
 
 	public var right (g_right,  s_right):Int;
-	inline function g_right ():Int  { return (x + width);  }
-	inline function s_right (v:Int):Int { 
+	private inline function g_right ():Int  { return (x + width);  }
+	private inline function s_right (v:Int):Int { 
 		width = (v - x); 
 		return v; 
 	}
 
 	public var bottom (g_bottom, s_bottom):Int;
-	inline function g_bottom():Int  { return (y + height); }
-	inline function s_bottom(v:Int):Int { 
+	private inline function g_bottom():Int  { return (y + height); }
+	private inline function s_bottom(v:Int):Int { 
 		height = (v - y); 
 		return v; 
 	}
 
 	public var empty (g_empty, never):Bool;
-	inline function g_empty():Bool { 
+	private inline function g_empty():Bool { 
 		return (width <= 0 || height <= 0); 
 	}
 

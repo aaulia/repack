@@ -43,7 +43,7 @@ class Main {
 			}
 
 			switch (key) {
-				case "-h", "-help"   : printHelp();
+				case "-help"         : printHelp();
 				case "-o", "-output" : output = new Path(args.shift());
 				case "-i", "-input"  : inputs = args.shift().split(":");
 				default              : config.parse(key, args);
@@ -99,7 +99,7 @@ class Main {
 			while (index < count) {
 				var entry = images[index];
 				if (packer.add(entry.image.width, entry.image.height, entry)) {
-					images.splice(index, 1);
+					images.remove(entry);
 					--index;
 					--count;
 				}
@@ -130,7 +130,7 @@ class Main {
 	private static function printHelp() {
 		Sys.println("Usage: repack [options]");
 		Sys.println("Options are:");
-		Sys.println("-h, -help   : Print this help");
+		Sys.println("-help       : Print this help");
 		Sys.println("-i, -input  : File(s) or directories to be used as input path, ");
 		Sys.println("              separated by ':'. Directories are read recursively." );
 		Sys.println("-o, -output : File or directory to place the result");
@@ -165,19 +165,22 @@ class Main {
 	private static function parsePaths(inputs:Iterable<String>, output:Array<PackData>, ?directory:String):Array<PackData> {
 		var cwd = (directory == null) ? Sys.getCwd() : directory;
 		for (input in inputs) {
+			if (input.endsWith("/") || input.endsWith("\\")) {
+				input = input.substr(0, input.length - 1);
+			}
+
 			var path = cwd + input;
 			if (!FileSystem.exists(path)) {
 				error("Invalid path: $path".format());
 				return [];
 			}
-
 			path = FileSystem.fullPath(path);
 
 			if (FileSystem.isDirectory(path)) {
 				if (!path.endsWith("\\") || !path.endsWith("/")) {
 					path += "/";
 				}
-				parsePaths(FileSystem.readDirectory(input), output, path);
+				parsePaths(FileSystem.readDirectory(path), output, path);
 			} else {
 				if (!path.endsWith(".png")) {
 					continue;
@@ -188,7 +191,6 @@ class Main {
 		return output;
 	}
 
-	private static inline function warn (msg) { Sys.println(msg); }
 	private static inline function error(msg, code = -1) {
 		Sys.println(msg);
 		Sys.exit(code);
