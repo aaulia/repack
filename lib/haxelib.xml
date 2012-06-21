@@ -6,5 +6,5 @@
     <tag v="sprite"/>
     <tag v="texture"/>
     <description>Repack is a library/tool for doing rectangle/texture/sprite packing using MAXRECT algorithm</description>
-    <version name="1.1">Bug fixes, better path handling</version>
+    <version name="1.2">Bug fixes, better path handling, add option for padding</version>
 </project>

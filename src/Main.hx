@@ -135,6 +135,7 @@ class Main {
 		Sys.println("-o, -output : File or directory to place the result");
 		Sys.println("-w, -width  : Canvas/atlas width");
 		Sys.println("-h, -height : Canvas/atlas height");
+        Sys.println("-p, -padding: Amount of padding between rectangles");
 		Sys.println("-m, -method : Packing method, which can be one of:");
 		Sys.println("                  tl -> TopLeftPacking");
 		Sys.println("                  a  -> BestAreaPacking");
