@@ -63,6 +63,20 @@ class Rectangle {
 		
 		return r;
 	}
+	
+	public function inflate(v:Int) {
+		left   -= v;
+		top    -= v;
+		right  += v;
+		bottom += v;
+	}
+	
+	public function deflate(v:Int) {
+		left   += v;
+		top    += v;
+		right  -= v;
+		bottom -= v;		
+	}
 
 	public function toString() {
 		return "{ x: $x, y: $y, width: $width, height: $height }".format();

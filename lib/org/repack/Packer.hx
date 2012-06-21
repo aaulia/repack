@@ -41,10 +41,11 @@ class Packed<T> {
 
 class Packer<T> implements Generic {
 
-	public var width  (default, null) :Int;
-	public var height (default, null) :Int;
-	public var method (default, null) :PackingMethod;
-	public var rotate (default, null) :RotateMethod;
+	public var width   (default, null) :Int;
+	public var height  (default, null) :Int;
+	public var method  (default, null) :PackingMethod;
+	public var rotate  (default, null) :RotateMethod;
+	public var padding (default, null) :Int;
 
 
 	public var length (g_length, never) :Int;
@@ -57,11 +58,12 @@ class Packer<T> implements Generic {
 	private var used:Array<Packed<T>>;
 
 
-	public function new(width:Int, height:Int, ?method:PackingMethod, ?rotate:RotateMethod) {
-		this.width  = width;
-		this.height = height;
-		this.method = (method == null) ? TopLeftPacking : method;
-		this.rotate = (rotate == null) ? NoRotation     : rotate;
+	public function new(width:Int, height:Int, padding:Int = 0, ?method:PackingMethod, ?rotate:RotateMethod) {
+		this.width   = width;
+		this.height  = height;
+		this.method  = (method == null) ? TopLeftPacking : method;
+		this.rotate  = (rotate == null) ? NoRotation     : rotate;
+		this.padding = padding;
 
 		clear();
 	}
@@ -84,6 +86,9 @@ class Packer<T> implements Generic {
 			case BestLongSidePacking  : findBestLongSide;
 		}
 
+		width  += padding * 2;
+		height += padding * 2;
+		
 		var rotated = false;
 		var space   = null;
 		switch(this.rotate) {
@@ -116,6 +121,7 @@ class Packer<T> implements Generic {
 		var rect    = space.clone();
 		rect.width  = (rotated == false) ? width  : height;
 		rect.height = (rotated == false) ? height : width;
+		rect.deflate(padding);
 
 		place(rect);
 		purge();

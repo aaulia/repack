@@ -72,11 +72,10 @@ class Main {
 			return d;
 		});
 		
-		
-		
-		var odir  = output.dir  == null ? Sys.getCwd() : output.dir;
-		var ofile = output.file == null ? "pack"       : output.file;
-		var oext  = output.ext  == null ? "png"        : output.ext; 
+
+		var odir  = (output.dir  == null || output.dir  == "") ? "."    : output.dir;
+		var ofile = (output.file == null || output.file == "") ? "pack" : output.file;
+		var oext  = (output.ext  == null || output.ext  == "") ? "png"  : output.ext; 
 
 		if (oext != "png") { oext = "png"; }
 		if (FileSystem.exists(odir) == false) {	
@@ -89,7 +88,7 @@ class Main {
 		var page   = 0;
 		var coords = [];
 		var canvas = Image.create(config.width, config.height);
-		var packer = new Packer<PackData>(config.width, config.height, config.method, config.rotate);
+		var packer = new Packer<PackData>(config.width, config.height, config.padding, config.method, config.rotate);
 
 		while (images.length > 0) {
 			packer.clear();
@@ -163,7 +162,7 @@ class Main {
 	}
 
 	private static function parsePaths(inputs:Iterable<String>, output:Array<PackData>, ?directory:String):Array<PackData> {
-		var cwd = (directory == null) ? Sys.getCwd() : directory;
+		var cwd = (directory == null) ? "" : directory;
 		for (input in inputs) {
 			if (input.endsWith("/") || input.endsWith("\\")) {
 				input = input.substr(0, input.length - 1);
@@ -174,7 +173,7 @@ class Main {
 				error("Invalid path: $path".format());
 				return [];
 			}
-			path = FileSystem.fullPath(path);
+			//path = FileSystem.fullPath(path);
 
 			if (FileSystem.isDirectory(path)) {
 				if (!path.endsWith("\\") || !path.endsWith("/")) {
@@ -344,23 +343,25 @@ private class Image {
 
 private class Config {
 
-	public var width  (default, null) :Int;
-	public var height (default, null) :Int;
-	public var method (default, null) :PackingMethod;
-	public var sorter (default, null) :Array< PackData->PackData->Int >;
-	public var rotate (default, null) :RotateMethod;
-	public var powOf2 (default, null) :Bool;
+	public var width   (default, null) :Int;
+	public var height  (default, null) :Int;
+	public var method  (default, null) :PackingMethod;
+	public var sorter  (default, null) :Array< PackData->PackData->Int >;
+	public var rotate  (default, null) :RotateMethod;
+	public var padding (default, null) :Int;
+	public var powOf2  (default, null) :Bool;
 
 	public function new() {
-		width  = 256;
-		height = 256;
-		method = parseMethod("tl");
-		sorter = parseSorter("max:min:w:h");
-		rotate = NoRotation;
-		powOf2 = false;
+		width   = 256;
+		height  = 256;
+		method  = parseMethod("tl");
+		sorter  = parseSorter("max:min:w:h");
+		rotate  = NoRotation;
+		padding = 0;
+		powOf2  = false;
 	}
 
-	function parseMethod(s:String) {
+	private function parseMethod(s:String) {
 		return switch (s.toLowerCase()) {
 			case "tl" : TopLeftPacking;
 			case "a"  : BestAreaPacking;
@@ -370,10 +371,10 @@ private class Config {
 		};
 	}
 
-	inline function max(a, b) {	return (a < b) ? b : a;	}
-	inline function min(a, b) {	return (a > b) ? b : a;	}
+	private inline function max(a, b) {	return (a < b) ? b : a;	}
+	private inline function min(a, b) {	return (a > b) ? b : a;	}
 
-	function parseSorter(s:String) {
+	private function parseSorter(s:String) {
 		var res = [];
 		var opt = s.toLowerCase().split(":");
 		var dup = [];
@@ -426,12 +427,15 @@ private class Config {
 
 	public function parse(key:String, args:Array<String>):Void {
 		switch (key) {
-			case "-w", "-width"  : this.width  = args.shift().parseInt();
-			case "-h", "-height" : this.height = args.shift().parseInt();
-			case "-m", "-method" : this.method = parseMethod(args.shift());
-			case "-s", "-sort"   : this.sorter = parseSorter(args.shift());
-			case "-r", "-rotate" : this.rotate = parseRotate(args.shift());
-			case "-po2"          : this.powOf2 = true;
+			case "-w", "-width"  : this.width   = args.shift().parseInt();
+			case "-h", "-height" : this.height  = args.shift().parseInt();
+			case "-p", "-padding": this.padding = args.shift().parseInt();
+			
+			case "-m", "-method" : this.method  = parseMethod(args.shift());
+			case "-s", "-sort"   : this.sorter  = parseSorter(args.shift());
+			case "-r", "-rotate" : this.rotate  = parseRotate(args.shift());
+			
+			case "-po2"          : this.powOf2  = true;
 		}
 	}
 
