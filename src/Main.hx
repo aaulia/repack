@@ -153,6 +153,8 @@ class Main {
 		Sys.println("-r, -rotate : Use rotation to maximize placement, can be one of:");
 		Sys.println("              normal     -> Only rotate if there is no space found.");
 		Sys.println("              aggressive -> Always rotate, and choose the best one.");
+		Sys.println("-po2        : Round the width & height to the next highest power of 2");
+		Sys.println("-square     : Keep width == height");
 		Sys.exit(0);
 	}
 
@@ -224,9 +226,11 @@ private class Image {
 	}
 
 	public static function open(path:String):Image {
-		var d = new Reader(File.read(path, true)).read();
+		var f = File.read(path, true);
+		var d = new Reader(f).read();
 		var b = Tools.extract32(d);
 		var h = Tools.getHeader(d);
+		f.close();
 		return new Image(h.width, h.height, b, h.color);
 	}
 
@@ -336,21 +340,63 @@ private class Image {
 	}
 
 	public function save(path:String) {
-		var w = new Writer(File.write(path, true));
+		var f = File.write(path, true);
+		var w = new Writer(f);
 		var d = Tools.build32LE(width, height, pixels);
 		w.write(d);
+		f.close();
 	}
 }
 
 private class Config {
 
-	public var width   (default, null) :Int;
-	public var height  (default, null) :Int;
+	public  var width  (g_w, s_w) :Int;
+	public  var height (g_h, s_h) :Int;
+	
+	private var _width :Int;
+	private var _height:Int;
+	
+	private function s_w(v:Int) { return _width = v; }
+	private function g_w():Int {
+		if (square) { _width = max(_width, _height); }
+		if (powOf2 && !isPo2(_width)) {
+			_width = toPo2(_width);
+		}
+		
+		return _width;
+	}
+	
+	private function s_h(v:Int) { return _height = v; }
+	private function g_h():Int {
+		if (square) { _height = max(_width, _height); }
+		if (powOf2 && !isPo2(_height)) {
+			_height = toPo2(_height);
+		}
+		
+		return _height;
+	}
+	
+	private inline function isPo2(v:Int):Bool {
+		return (v > 0) && ((v & (v - 1)) == 0);
+	}
+	
+	private inline function toPo2(v:Int):Int {
+		v--;
+		v |= v >> 1;
+		v |= v >> 2;
+		v |= v >> 4;
+		v |= v >> 8;
+		v |= v >> 16;
+		v++;
+		return v;
+	}
+	
 	public var method  (default, null) :PackingMethod;
 	public var sorter  (default, null) :Array< PackData->PackData->Int >;
 	public var rotate  (default, null) :RotateMethod;
 	public var padding (default, null) :Int;
 	public var powOf2  (default, null) :Bool;
+	public var square  (default, null) :Bool;
 
 	public function new() {
 		width   = 256;
@@ -360,6 +406,7 @@ private class Config {
 		rotate  = NoRotation;
 		padding = 0;
 		powOf2  = false;
+		square  = false;
 	}
 
 	private function parseMethod(s:String) {
@@ -437,6 +484,7 @@ private class Config {
 			case "-r", "-rotate" : this.rotate  = parseRotate(args.shift());
 			
 			case "-po2"          : this.powOf2  = true;
+			case "-square"       : this.square  = true;
 		}
 	}
 
