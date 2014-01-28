@@ -1,21 +1,16 @@
 package;
 
+import haxe.io.Path;
+import haxe.Json;
+import haxe.io.Bytes;
+import org.repack.Packer;
+import org.repack.Rectangle;
+import sys.FileSystem;
+import sys.io.File;
 import format.png.Data;
 import format.png.Reader;
 import format.png.Writer;
 import format.png.Tools;
-
-import haxe.io.Bytes;
-import haxe.io.Path;
-
-import haxe.Json;
-import neko.Sys;
-
-import sys.FileSystem;
-import sys.io.File;
-
-import org.repack.Packer;
-import org.repack.Rectangle;
 
 using Std;
 using Lambda;
@@ -119,8 +114,8 @@ class Main {
 				});
 			}
 			
-			canvas.save("${odir}/${ofile}_${page}.${oext}".format());
-			saveJSON(coords, "${odir}/${ofile}_${page}.json".format());
+			canvas.save('${odir}/${ofile}_${page}.${oext}');
+			saveJSON(coords, '${odir}/${ofile}_${page}.json');
 			++page;
 		}
 
@@ -173,7 +168,7 @@ class Main {
 
 			var path = cwd + input;
 			if (!FileSystem.exists(path)) {
-				error("Invalid path: $path".format());
+				error('Invalid path: $path');
 				return [];
 			}
 			//path = FileSystem.fullPath(path);
@@ -342,7 +337,7 @@ private class Image {
 	public function save(path:String) {
 		var f = File.write(path, true);
 		var w = new Writer(f);
-		var d = Tools.build32LE(width, height, pixels);
+		var d = Tools.build32BGRA(width, height, pixels);
 		w.write(d);
 		f.close();
 	}
@@ -350,14 +345,14 @@ private class Image {
 
 private class Config {
 
-	public  var width  (g_w, s_w) :Int;
-	public  var height (g_h, s_h) :Int;
+	public  var width  (get, set) :Int;
+	public  var height (get, set) :Int;
 	
 	private var _width :Int;
 	private var _height:Int;
 	
-	private function s_w(v:Int) { return _width = v; }
-	private function g_w():Int {
+	private function set_width(v:Int) { return _width = v; }
+	private function get_width():Int {
 		if (square) { _width = max(_width, _height); }
 		if (powOf2 && !isPo2(_width)) {
 			_width = toPo2(_width);
@@ -366,8 +361,8 @@ private class Config {
 		return _width;
 	}
 	
-	private function s_h(v:Int) { return _height = v; }
-	private function g_h():Int {
+	private function set_height(v:Int) { return _height = v; }
+	private function get_height():Int {
 		if (square) { _height = max(_width, _height); }
 		if (powOf2 && !isPo2(_height)) {
 			_height = toPo2(_height);
@@ -467,10 +462,12 @@ private class Config {
 	}
 
 	function parseRotate(r:String):RotateMethod {
-		return switch (r) {
-			case "normal"     : NormalRotate;
-			case "aggressive" : AggressiveRotate;
+        var method:RotateMethod = RotateMethod.NoRotation;
+		switch (r) {
+			case "normal"     : method = NormalRotate;
+			case "aggressive" : method = AggressiveRotate;
 		}
+        return method;
 	}
 
 	public function parse(key:String, args:Array<String>):Void {
@@ -489,6 +486,6 @@ private class Config {
 	}
 
 	public function toString() {
-		return "{ width: $width, height: $height, method: $method, sorter: $sorter, rotate: $rotate, powerOfTwo: $powOf2 }".format();
+		return '{ width: $width, height: $height, method: $method, sorter: $sorter, rotate: $rotate, powerOfTwo: $powOf2 }';
 	}
 }

@@ -79,39 +79,39 @@ class Rectangle {
 	}
 
 	public function toString() {
-		return "{ x: $x, y: $y, width: $width, height: $height }".format();
+		return '{ x: $x, y: $y, width: $width, height: $height }';
 	}
 
-	public var left (g_left, s_left):Int;
-	private inline function g_left():Int  { return x; }
-	private inline function s_left(v:Int):Int { 
+	public var left (get, set):Int;
+	private inline function get_left():Int  { return x; }
+	private inline function set_left(v:Int):Int { 
 		width -= (v - x); 
 		return x = v; 
 	}
 
-	public var top (g_top, s_top):Int;
-	private inline function g_top():Int  { return y; }
-	private inline function s_top(v:Int):Int { 
+	public var top (get, set):Int;
+	private inline function get_top():Int  { return y; }
+	private inline function set_top(v:Int):Int { 
 		height -= (v - y); 
 		return y = v; 
 	}
 
-	public var right (g_right,  s_right):Int;
-	private inline function g_right ():Int  { return (x + width);  }
-	private inline function s_right (v:Int):Int { 
+	public var right (get, set):Int;
+	private inline function get_right ():Int  { return (x + width);  }
+	private inline function set_right (v:Int):Int { 
 		width = (v - x); 
 		return v; 
 	}
 
-	public var bottom (g_bottom, s_bottom):Int;
-	private inline function g_bottom():Int  { return (y + height); }
-	private inline function s_bottom(v:Int):Int { 
+	public var bottom (get, set):Int;
+	private inline function get_bottom():Int  { return (y + height); }
+	private inline function set_bottom(v:Int):Int { 
 		height = (v - y); 
 		return v; 
 	}
 
-	public var empty (g_empty, never):Bool;
-	private inline function g_empty():Bool { 
+	public var empty (get, never):Bool;
+	private inline function get_empty():Bool { 
 		return (width <= 0 || height <= 0); 
 	}
 

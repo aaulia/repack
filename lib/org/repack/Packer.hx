@@ -1,5 +1,4 @@
 package org.repack;
-import haxe.rtti.Generic;
 
 using Std;
 using Lambda;
@@ -39,7 +38,7 @@ class Packed<T> {
 }
 
 
-class Packer<T> implements Generic {
+@:Generic class Packer<T> {
 
 	public var width   (default, null) :Int;
 	public var height  (default, null) :Int;
@@ -48,8 +47,8 @@ class Packer<T> implements Generic {
 	public var padding (default, null) :Int;
 
 
-	public var length (g_length, never) :Int;
-	private inline function g_length():Int {
+	public var length (get, never) :Int;
+	private inline function get_length():Int {
 		return used.length;
 	}
 
