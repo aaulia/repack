@@ -1,0 +1,13 @@
+{
+  "name": "repack",
+  "url": "http://github.com/aaulia/repack",
+  "license": "MIT",
+  "tags": ["cross","packing","rectangle","sprite","texture"],
+  "description": "Repack is a library/tool for doing rectangle/texture/sprite packing using MAXRECT algorithm",
+  "version": "1.2",
+  "releasenote": "Bug fixes, better path handling, add option for padding",
+  "contributors": ["aaulia"],
+  "dependencies": {
+
+  }
+}
